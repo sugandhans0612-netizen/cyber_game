@@ -1,0 +1,87 @@
+body {
+    background: #0d0d0d;
+    color: #00ffcc;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+h1 {
+    text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    letter-spacing: 5px;
+}
+
+#container {
+    background: rgba(0, 255, 204, 0.05);
+    border: 2px solid #00ffcc;
+    padding: 3rem;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+    width: 80%;
+    max-width: 600px;
+}
+
+button {
+    margin: 15px;
+    padding: 12px 25px;
+    border: 1px solid #00ffcc;
+    background: transparent;
+    color: #00ffcc;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+button:hover {
+    background: #00ffcc;
+    color: #0d0d0d;
+    box-shadow: 0 0 15px #00ffcc;
+}
+
+#question {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    line-height: 1.4;
+}
+
+#result {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    font-weight: bold;
+    min-height: 1.5em;
+}
+
+.score-display {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 1.2rem;
+    border: 1px solid #00ffcc;
+    padding: 10px;
+}
+
+.start-btn {
+    font-size: 1.5rem;
+    padding: 20px 40px;
+}
+
+@keyframes flicker {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+.cyber-flicker {
+    animation: flicker 2s infinite;
+}

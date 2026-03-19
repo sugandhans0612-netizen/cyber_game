@@ -1,0 +1,42 @@
+[
+  {
+    "q": "What should you do if you receive an email from your bank asking for your password?",
+    "options": ["Provide it immediately", "Delete the email and call your bank"],
+    "answer": 1
+  },
+  {
+    "q": "Which of these is a strong password?",
+    "options": ["password123", "P@ssw0rd!2026#"],
+    "answer": 1
+  },
+  {
+    "q": "What is two-factor authentication (2FA)?",
+    "options": ["Using two different passwords", "Using a password and a secondary code"],
+    "answer": 1
+  },
+  {
+    "q": "Is it safe to use public Wi-Fi for online banking?",
+    "options": ["Yes, it's fine", "No, it's risky"],
+    "answer": 1
+  },
+  {
+    "q": "What is phishing?",
+    "options": ["A type of cyber attack", "A way to catch fish"],
+    "answer": 0
+  },
+  {
+    "q": "What should you do before clicking a link in an unexpected email?",
+    "options": ["Click it immediately", "Hover over the link to see the real URL"],
+    "answer": 1
+  },
+  {
+    "q": "What is the purpose of a firewall?",
+    "options": ["To protect against physical fires", "To block unauthorized network access"],
+    "answer": 1
+  },
+  {
+    "q": "Should you share your OTP with anyone?",
+    "options": ["Yes, if they say they are from tech support", "No, never"],
+    "answer": 1
+  }
+]

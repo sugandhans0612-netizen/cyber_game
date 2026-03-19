@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Security Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <h1 class="cyber-flicker">💻 CYBER_SECURITY_GAME</h1>
+
+    <div class="score-display">SCORE: <span id="scoreVal">0</span></div>
+
+    <div id="container">
+        <div id="intro">
+            <p>Welcome, Agent. Test your security awareness.</p>
+            <button onclick="startGame()" class="start-btn">INITIALIZE SYSTEM</button>
+        </div>
+
+        <div id="game" style="display:none;">
+            <h2 id="question"></h2>
+            <div id="options">
+                <button onclick="checkAnswer(0)" id="btn0"></button>
+                <button onclick="checkAnswer(1)" id="btn1"></button>
+            </div>
+            <p id="result"></p>
+        </div>
+    </div>
+
+    <script>
+        const questions = {{ questions | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
