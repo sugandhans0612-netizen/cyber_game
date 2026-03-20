@@ -5,18 +5,30 @@ import os
 app = Flask(__name__)
 app.secret_key = 'cyber_security_secret_key_2026'
 
-LEADERBOARD_FILE = 'leaderboard.json'
+# Use /tmp for the leaderboard file on Vercel (ephemeral storage)
+# In production, use a real database (Vercel KV, PostgreSQL, etc.)
+LEADERBOARD_FILE = '/tmp/leaderboard.json' if os.environ.get('VERCEL') else 'leaderboard.json'
 
 def load_leaderboard():
-    if not os.path.exists(LEADERBOARD_FILE):
-        with open(LEADERBOARD_FILE, 'w') as f:
-            json.dump([], f)
-    with open(LEADERBOARD_FILE, 'r') as f:
-        return json.load(f)
+    try:
+        if not os.path.exists(LEADERBOARD_FILE):
+            # Try to load from initial local file if it exists
+            if os.path.exists('leaderboard.json') and LEADERBOARD_FILE != 'leaderboard.json':
+                with open('leaderboard.json', 'r') as f:
+                    return json.load(f)
+            return []
+        with open(LEADERBOARD_FILE, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error loading leaderboard: {e}")
+        return []
 
 def save_leaderboard(data):
-    with open(LEADERBOARD_FILE, 'w') as f:
-        json.dump(data, f, indent=4)
+    try:
+        with open(LEADERBOARD_FILE, 'w') as f:
+            json.dump(data, f, indent=4)
+    except Exception as e:
+        print(f"Error saving leaderboard: {e}")
 
 @app.route('/')
 def home():
