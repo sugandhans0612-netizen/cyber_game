@@ -4,22 +4,420 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber Security Game</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #00ff9f;
+            --green-dim: #00cc7a;
+            --green-glow: rgba(0, 255, 159, 0.35);
+            --red: #ff2d55;
+            --yellow: #ffd60a;
+            --bg: #020b08;
+            --panel: rgba(0, 255, 159, 0.04);
+            --border: rgba(0, 255, 159, 0.2);
+            --text: #c8fce8;
+            --mono: 'Share Tech Mono', monospace;
+            --display: 'Orbitron', sans-serif;
+        }
 
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--mono);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 4rem;
+            overflow-x: hidden;
+        }
+
+        /* ── Scanline overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.18) 2px,
+                rgba(0,0,0,0.18) 4px
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* ── Grid background ── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,255,159,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,159,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Corner decoration ── */
+        .corner { position: fixed; width: 60px; height: 60px; opacity: 0.5; }
+        .corner::before, .corner::after { content: ''; position: absolute; background: var(--green); }
+        .corner::before { width: 100%; height: 2px; top: 0; left: 0; }
+        .corner::after  { width: 2px; height: 100%; top: 0; left: 0; }
+        .corner.tl { top: 16px; left: 16px; }
+        .corner.tr { top: 16px; right: 16px; transform: scaleX(-1); }
+        .corner.bl { bottom: 16px; left: 16px; transform: scaleY(-1); }
+        .corner.br { bottom: 16px; right: 16px; transform: scale(-1); }
+
+        /* ── Header ── */
+        header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-eyebrow {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.4em;
+            color: var(--green-dim);
+            margin-bottom: 0.4rem;
+            opacity: 0.7;
+        }
+
+        h1 {
+            font-family: var(--display);
+            font-weight: 900;
+            font-size: clamp(1.6rem, 5vw, 3rem);
+            letter-spacing: 0.05em;
+            color: var(--green);
+            text-shadow:
+                0 0 8px var(--green-glow),
+                0 0 30px var(--green-glow),
+                0 0 80px rgba(0,255,159,0.15);
+            animation: flicker 8s infinite;
+            line-height: 1.1;
+        }
+
+        @keyframes flicker {
+            0%,95%,100%  { opacity: 1; }
+            96%          { opacity: 0.6; }
+            97%          { opacity: 1; }
+            98%          { opacity: 0.4; }
+            99%          { opacity: 1; }
+        }
+
+        /* ── HUD bar ── */
+        .hud {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 1.2rem;
+            margin: 1.2rem 0 2rem;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+        }
+        .hud::before {
+            content: '//HUD';
+            position: absolute;
+            top: -0.55rem; left: 1rem;
+            background: var(--bg);
+            padding: 0 0.4rem;
+            font-size: 0.6rem;
+            color: var(--green-dim);
+            opacity: 0.6;
+        }
+        .hud-item span { color: var(--green); font-weight: bold; }
+
+        /* ── Panel ── */
+        #container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 640px;
+        }
+
+        .panel {
+            border: 1px solid var(--border);
+            background: var(--panel);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .panel::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -0.6rem; left: 1.5rem;
+            background: var(--bg);
+            padding: 0 0.6rem;
+            font-size: 0.65rem;
+            letter-spacing: 0.25em;
+            color: var(--green);
+            opacity: 0.8;
+        }
+        .panel::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 18px; height: 18px;
+            border-right: 2px solid var(--green);
+            border-bottom: 2px solid var(--green);
+            opacity: 0.4;
+        }
+
+        .panel h2 {
+            font-family: var(--display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--green);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px var(--green-glow);
+        }
+
+        .panel p {
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── Input ── */
+        input[type="text"] {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--green-dim);
+            color: var(--green);
+            font-family: var(--mono);
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            padding: 0.6rem 0.2rem;
+            outline: none;
+            margin-bottom: 1.8rem;
+            caret-color: var(--green);
+            transition: border-color 0.2s;
+        }
+        input::placeholder { color: rgba(0,255,159,0.25); }
+        input:focus { border-bottom-color: var(--green); box-shadow: 0 2px 0 0 var(--green-glow); }
+
+        /* ── Buttons ── */
+        .btn-row { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+        button {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+
+        .start-btn {
+            background: var(--green);
+            color: var(--bg);
+            padding: 0.75rem 1.8rem;
+            font-weight: bold;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+        }
+        .start-btn:hover {
+            background: #fff;
+            box-shadow: 0 0 20px var(--green-glow);
+            transform: translateY(-1px);
+        }
+
+        .secondary-btn {
+            background: transparent;
+            color: var(--green);
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .secondary-btn:hover {
+            border-color: var(--green);
+            background: rgba(0,255,159,0.06);
+            box-shadow: 0 0 12px var(--green-glow);
+        }
+
+        /* ── Question & options ── */
+        #question {
+            font-family: var(--display);
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            line-height: 1.6;
+            color: var(--text);
+            margin-bottom: 2rem;
+        }
+
+        #options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        #options button {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            line-height: 1.5;
+            position: relative;
+            transition: all 0.15s;
+        }
+
+        #options button::before {
+            content: '▶';
+            color: var(--green);
+            margin-right: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        #options button:hover {
+            border-color: var(--green);
+            color: var(--green);
+            background: rgba(0,255,159,0.05);
+            padding-left: 1.6rem;
+            box-shadow: inset 3px 0 0 var(--green), 0 0 10px var(--green-glow);
+        }
+
+        #options button:hover::before { opacity: 1; }
+
+        /* ── Result feedback ── */
+        #result {
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            min-height: 1.4em;
+            padding: 0.6rem 1rem;
+            border-left: 3px solid transparent;
+        }
+        #result.correct {
+            color: var(--green);
+            border-left-color: var(--green);
+            background: rgba(0,255,159,0.06);
+        }
+        #result.wrong {
+            color: var(--red);
+            border-left-color: var(--red);
+            background: rgba(255,45,85,0.06);
+        }
+
+        /* ── Leaderboard ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        th {
+            font-family: var(--display);
+            font-size: 0.65rem;
+            letter-spacing: 0.25em;
+            color: var(--green-dim);
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid rgba(0,255,159,0.07);
+            letter-spacing: 0.05em;
+        }
+        tr:hover td { background: rgba(0,255,159,0.04); }
+        td:first-child { color: var(--green-dim); font-size: 0.7rem; }
+        td:last-child  { color: var(--green); font-family: var(--display); font-size: 0.85rem; }
+
+        /* ── Blinking cursor ── */
+        .cursor::after {
+            content: '█';
+            animation: blink 1s step-end infinite;
+            color: var(--green);
+            margin-left: 2px;
+            font-size: 0.9em;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* ── Progress bar ── */
+        .progress-wrap {
+            height: 2px;
+            background: rgba(0,255,159,0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green-glow);
+            transition: width 0.4s ease;
+        }
+
+        /* ── Fade-in ── */
+        .fade-in { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    </style>
+</head>
 <body>
 
-    <h1 class="cyber-flicker">💻 CYBER_SECURITY_GAME</h1>
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
 
-    <div class="score-display">SCORE: <span id="scoreVal">0</span></div>
+    <header>
+        <div class="logo-eyebrow">// CLASSIFIED // CLEARANCE REQUIRED //</div>
+        <h1>CYBER_SEC<br>URITY_GAME</h1>
+    </header>
+
+    <div class="hud">
+        <div class="hud-item">AGENT: <span id="agentName">GUEST</span></div>
+        <div class="hud-item">SCORE: <span id="scoreVal">0</span></div>
+        <div class="hud-item">STATUS: <span id="statusVal">STANDBY</span></div>
+    </div>
 
     <div id="container">
-        <div id="intro">
-            <p>Welcome, Agent. Test your security awareness.</p>
-            <button onclick="startGame()" class="start-btn">INITIALIZE SYSTEM</button>
+
+        <!-- Login -->
+        <div id="login-section" class="panel fade-in" data-label="// AUTH_PORTAL">
+            <h2>SECURE ACCESS REQUIRED</h2>
+            <p>Identity verification mandatory before mission briefing.<br>State your codename, Agent.</p>
+            <input type="text" id="usernameInput" placeholder="ENTER_CODENAME_" autocomplete="off">
+            <div class="btn-row">
+                <button onclick="login()" class="start-btn">▶ AUTHORIZE</button>
+            </div>
         </div>
 
-        <div id="game" style="display:none;">
+        <!-- Intro -->
+        <div id="intro" style="display:none;" class="panel" data-label="// MISSION_BRIEF">
+            <h2>BRIEFING READY<span class="cursor"></span></h2>
+            <p>Your security awareness will be tested across multiple threat scenarios. Identify risks. Neutralize vulnerabilities. Protect the network.</p>
+            <div class="btn-row">
+                <button onclick="startGame()" class="start-btn">▶ INITIALIZE MISSION</button>
+                <button onclick="showLeaderboard()" class="secondary-btn">LEADERBOARD</button>
+            </div>
+        </div>
+
+        <!-- Game -->
+        <div id="game" style="display:none;" class="panel" data-label="// THREAT_ASSESSMENT">
+            <div class="progress-wrap">
+                <div class="progress-bar" id="progressBar" style="width:0%"></div>
+            </div>
             <h2 id="question"></h2>
             <div id="options">
                 <button onclick="checkAnswer(0)" id="btn0"></button>
@@ -27,12 +425,24 @@
             </div>
             <p id="result"></p>
         </div>
+
+        <!-- Leaderboard -->
+        <div id="leaderboard-section" style="display:none;" class="panel" data-label="// TOP_AGENTS">
+            <h2>HALL OF OPERATIVES</h2>
+            <table id="leaderboardTable">
+                <thead>
+                    <tr><th>RANK</th><th>AGENT</th><th>SCORE</th></tr>
+                </thead>
+                <tbody id="leaderboardBody"></tbody>
+            </table>
+            <button onclick="hideLeaderboard()" class="secondary-btn">◀ RETURN TO BASE</button>
+        </div>
+
     </div>
 
     <script>
         const questions = {{ questions | tojson }};
     </script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-
 </body>
 </html>
