@@ -10,5 +10,17 @@
     {
         "username": "guest",
         "score": 6
+    },
+    {
+        "username": "student",
+        "score": 4
+    },
+    {
+        "username": "student",
+        "score": 4
+    },
+    {
+        "username": "leo",
+        "score": 3
     }
 ]

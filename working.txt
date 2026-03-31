@@ -1,0 +1,48 @@
+# Cyber Security Game - Technical Documentation
+
+## 1. Project Overview
+A modern, web-based cybersecurity awareness game built with a Flask backend, PostgreSQL database, and a dynamic "Cyber" themed frontend.
+
+## 2. Technical Architecture
+- **Backend**: Python 3.x with Flask framework.
+- **Database**: PostgreSQL (Dockerized) for persistent user and score storage.
+- **Frontend**: HTML5, CSS3 (with variables and keyframe animations), and Vanilla JavaScript (ES6+).
+- **Deployment**: Configured for Vercel (Serverless) with environment-aware filesystem handling.
+
+## 3. Core Modules & Data Flow
+
+### A. Authentication System
+- **Registration**: Collects `username`, `email` (validated via regex), and `password`.
+- **Security**: Passwords are hashed using `PBKDF2` with a salt via `werkzeug.security`.
+- **Recovery**: "Forgot Password" portal allows email-based passcode reset.
+- **Sessions**: Flask session management for persistent "Authorized" state.
+- **Logout**: Secure session termination from any state.
+
+### B. Game Engine (Frontend)
+- **Randomization**: Fisher-Yates shuffle algorithm ensures unique question order per mission.
+- **State Management**: Transitions between `Login` -> `Briefing` -> `Active Mission` -> `Report`.
+- **Dynamic UI**: Real-time HUD (Heads-Up Display) updates for score, agent identity, and mission status.
+- **Progress Tracking**: Visual progress bar updates dynamically as questions are answered.
+
+### C. Backend API Endpoints
+- `POST /register`: Validates and stores new operative profiles.
+- `POST /login`: Authenticates agents and initializes sessions.
+- `POST /logout`: Clears active sessions.
+- `POST /forgot_password`: Resets passcodes for verified emails.
+- `POST /submit_score`: Uploads final mission results to the PostgreSQL database.
+- `GET /leaderboard`: Retrieves the top 10 agents globally.
+
+## 4. Database Schema
+- **users table**: `id`, `username` (unique), `email` (unique), `password` (hashed).
+- **leaderboard table**: `id`, `username`, `score`, `created_at`.
+
+## 5. UI/UX Design (Cyber Theme)
+- **Visuals**: Neon green/red color palette, CRT scanline overlays, flickering animations, and angular "hacker" paneling.
+- **Responsiveness**: Mobile-friendly layout with adaptive HUD and panels.
+- **Feedback**: Instant visual feedback for correct (Access Granted) and incorrect (Access Denied) answers.
+
+## 6. Current Operational Status
+- Database initialized and connected.
+- All auth flows (Login/Register/Recovery) fully functional.
+- Leaderboard persistent and dynamically updating.
+- Ready for mission deployment.
